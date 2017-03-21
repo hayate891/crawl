@@ -38,13 +38,13 @@ string weird_glowing_colour()
 }
 
 // Make the player swap positions with a given monster.
-void swap_with_monster(monster* mon_to_swap)
+void swap_with_monster(monster* mon_to_swap, bool is_transporter)
 {
     monster& mon(*mon_to_swap);
     ASSERT(mon.alive());
     const coord_def newpos = mon.pos();
 
-    if (you.stasis())
+    if (!is_transporter and you.stasis())
     {
         mpr("Your stasis prevents you from teleporting.");
         return;
@@ -63,7 +63,10 @@ void swap_with_monster(monster* mon_to_swap)
     // If it was submerged, it surfaces first.
     mon.del_ench(ENCH_SUBMERGED);
 
-    mprf("You swap places with %s.", mon.name(DESC_THE).c_str());
+    if (is_transporter)
+        mprf("You feel something pass by as you enter the transporter.");
+    else
+        mprf("You swap places with %s.", mon.name(DESC_THE).c_str());
 
     mon.move_to_pos(you.pos(), true, true);
 

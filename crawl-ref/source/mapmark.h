@@ -329,3 +329,5 @@ public:
 public:
     coord_def dest;
 };
+
+coord_def get_position_marker_at(const coord_def &pos);

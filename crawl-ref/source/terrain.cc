@@ -2080,7 +2080,7 @@ static bool _revert_terrain_to_floor(coord_def pos)
     }
 
     if (grd(pos) == DNGN_RUNED_DOOR && newfeat != DNGN_RUNED_DOOR)
-        opened_runed_door();
+        explored_keyed_feature(DNGN_RUNED_DOOR);
 
     grd(pos) = newfeat;
     set_terrain_changed(pos);

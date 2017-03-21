@@ -1283,3 +1283,11 @@ void remove_markers_and_listeners_at(coord_def p)
     env.markers.remove_markers_at(p);
     dungeon_events.clear_listeners_at(p);
 }
+
+coord_def get_position_marker_at(const coord_def &pos)
+{
+    map_marker *marker = env.markers.find(pos, MAT_POSITION);
+    ASSERT(marker);
+    map_position_marker *posm = dynamic_cast<map_position_marker*>(marker);
+    return posm->dest;
+}

@@ -4888,7 +4888,19 @@ static void _vault_grid_mapspec(vault_placement &place, const coord_def &where,
             _place_specific_trap(where, spec, 0, known);
     }
     else if (f.feat >= 0)
+    {
         grd(where) = static_cast<dungeon_feature_type>(f.feat);
+        if (f.feat == DNGN_TRANSPORTER && f.trans_dest_glyph > 0)
+        {
+            vector<coord_def> dests = place.map.find_glyph(f.trans_dest_glyph);
+            ASSERT(!dests.empty());
+            coord_def dest = dests[random2(dests.size())] + place.pos;
+            // XXX A bit ugly, but we have to place this through map due to env
+            // marker clearing that gets done in wizmode &L.
+            place.map.map.add_marker(
+                    new map_position_marker(where - place.pos, dest));
+        }
+    }
     else if (f.glyph >= 0)
         _vault_grid_glyph(place, where, f.glyph);
     else if (f.shop.get())
