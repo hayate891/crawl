@@ -461,8 +461,9 @@ ENDMAP
 
 NAME:    tomb_1_centre_old
 TAGS:    tomb_1_centre unrand
-SHUFFLE: AB), _-
+SHUFFLE: AB>, _-
 SUBST:   A=|*, B=|*
+MARKER:  > = lua:hatch_name("tomb_2_ambush")
 SUBST:   - = T
 SUBST:   _ = F 5 ~:30 .:30
 SUBST:   T = ~ .
@@ -477,7 +478,7 @@ SUBST:   t = ~ .:50
 #
 : set_feature_name("granite_statue", "sarcophagus")
 MAP
-..ttttttttttc................ctt)
+..ttttttttttc................ctt>
 ..ccccccccctc..3..........2..ct-t
 ..cA22c111ctc....3..........4c_tt
 ..c2c222ctttc......2.........+ccc
@@ -509,7 +510,8 @@ TILE:    M  = dngn_sarcophagus_pedestal_right
 COLOUR:  FM = yellow
 SUBST:   FM = G
 SUBST:   _  = V:70 5
-NSUBST:  >  = ) / | / * / _
+NSUBST:  >  = > / | / * / _
+MARKER:  > = lua:hatch_name("tomb_2_ambush")
 : set_feature_name("granite_statue", "sarcophagus")
 MAP
 >1..c..c.................c..c..1>
@@ -547,7 +549,8 @@ SUBST:   _  = V:70 5
 SHUFFLE: ABCD, EHIJ, de, fg, hi, jk
 SHUFFLE: NOPQRSTU, WXYZ6789
 SUBST:   AEdfhjNW = c, egik = +, BCDHIJOPQRSTUXYZ6789 = .
-NSUBST:  >  = ) / | / * / _
+NSUBST:  >  = > / | / * / _
+MARKER:  > = lua:hatch_name("tomb_2_ambush")
 : set_feature_name("granite_statue", "sarcophagus")
 MAP
 ...D............3............E...
@@ -576,8 +579,9 @@ NAME: tomb_1_centre_nicolae_necropolis
 TAGS: tomb_1_centre unrand
 SHUFFLE: AaBbQqDd/EeFfGgHh/IiJjKkLl/MmNnOoPp/RrSsUuVv
 SHUFFLE: Aa/Bb/Qq/Dd, Ee/Ff/Gg/Hh, Ii/Jj/Kk/Ll, Mm/Nn/Oo/Pp, Rr/Ss/Uu/Vv
-SUBST: AEIMR = +, a = ), ei = *|, mr = %, bq = 4, dhlpv = 3
+SUBST: AEIMR = +, a = >, ei = *|, mr = %, bq = 4, dhlpv = 3
 SUBST: BQDFGHJKLNOPSUV = c, fgjknosu = ', ' = ~..112
+MARKER:  > = lua:hatch_name("tomb_2_ambush")
 : tomb_1_mummy_set(_G)
 : tomb_guardian_set(_G, true)
 : tomb_1_mummy_priest_set(_G, true)
@@ -608,7 +612,8 @@ ENDMAP
 
 NAME:    tomb_1_hall_stairs_old
 TAGS:    tomb_1_hall_stairs unrand
-SHUFFLE: ]}
+SHUFFLE: )}
+: tomb_1_mummy_set(_G)
 SUBST:   ' = 3 .:200
 : tomb_guardian_set(_G, true)
 : tomb_1_mummy_priest_set(_G)
@@ -618,7 +623,7 @@ MAP
 ''c'''''''''''           '''''''''''c''
 ''c''ccccccc''           ''ccccccc''c''
 ''c''cc.211c''           ''c11.'cc''c''
-''c''c]'c11c''           ''c11c.}c''c''
+''c''c)'c11c''           ''c11c.}c''c''
 ''c''cccc''c''           ''c2'cccc''c''
 ''c''''''''c''           ''c''''''''c''
 ''c''''''''c''           ''c''''''''c''
@@ -634,7 +639,7 @@ SHUFFLE: ABCD / ACBD / ACDB / CABD / CADB / CDAB
 SHUFFLE: EFGH / EGFH / EGHF / GEFH / GEHF / GHEF
 SUBST:   ABEF = c, CDGH = '
 SUBST:   ' = 3 .:200
-NSUBST:  < = } / ., > = ] / .
+NSUBST:  < = } / ., > = ) / .
 : tomb_guardian_set(_G, true)
 : tomb_1_mummy_priest_set(_G)
 MAP
@@ -654,7 +659,7 @@ ENDMAP
 
 NAME:    tomb_1_hall_stairs_grunt_snakey
 TAGS:    tomb_1_hall_stairs unrand
-SHUFFLE: ]}
+SHUFFLE: )}
 SUBST:   ' = 3 .:200
 : tomb_guardian_set(_G, true)
 : tomb_1_mummy_priest_set(_G)
@@ -670,12 +675,12 @@ cccccccccccc''           '''ccccccccccc
 ''''''''''''''           ''''''''''''''
 cccccccccccc''           ''cccccccccccc
 ..211'''''''''           '''''''''112..
-]..11'''''''''           '''''''''11..}
+)..11'''''''''           '''''''''11..}
 ENDMAP
 
 NAME: tomb_1_hall_stairs_nicolae_cartouches
 TAGS: tomb_1_hall_stairs unrand
-SHUFFLE: ]}
+SHUFFLE: )}
 SUBST: ' = 3 .:200
 : tomb_guardian_set(_G, true)
 : tomb_1_mummy_priest_set(_G)
@@ -686,7 +691,7 @@ MAP
 '''''cccc'''cc           cc'''cccc'''''
 ''''cc'''c'''c           c'''c'''cc''''
 '''cc''''1c'''           '''c1''''cc'''
-''cc]'''211c''           ''c112'''}cc''
+''cc)'''211c''           ''c112'''}cc''
 '''cc''''1c'''           '''c1''''cc'''
 ''''cc'''c'''c           c'''c'''cc''''
 '''''cccc'''cc           cc'''cccc'''''
@@ -698,7 +703,7 @@ NAME: tomb_1_hall_stairs_nicolae_galleries
 TAGS: tomb_1_hall_stairs unrand
 SHUFFLE: AaZ/BbY, pq
 SUBST: ADp = ', Y = 2, ad = +, BbEeq = c, ' = 3 .:200
-NSUBST: Z = ] / }
+NSUBST: Z = ) / }
 : tomb_guardian_set(_G, true)
 : tomb_1_mummy_priest_set(_G)
 MAP
@@ -726,14 +731,18 @@ ORIENT:   encompass
 TAGS:     no_dump
 SUBVAULT: B : tomb_2_ambush
 #
-NSUBST:   A = [ / '
+NSUBST:   A = ( / '
 SHUFFLE:  Ww/Yy/Zz, Uu/Vv, Qq/Rr/Ss
 SUBST:    W=', w=c, Y=T, y=+, Z=T, z=+
 SUBST:    U=', u=c, V=T, v=+
 SUBST:    Q=', q=c, R=T, r=+, S=T, s=+
 #
-SHUFFLE:  ])}def
-SUBST:    d=", e=", f="
+NSUBST:   > = > / "
+MARKER:   > = lua:hatch_name("tomb_3_ambush")
+#
+SHUFFLE:  DE
+MARKER:   D = lua:hatch_dest_name("tomb_3_escape_1")
+MARKER:   E = lua:hatch_dest_name("tomb_3_escape_2")
 #
 SUBST:    T = ~ .
 SUBST:    ' = ~ ':100
@@ -760,20 +769,20 @@ ccccccccccccccccccccccccccccccccccccccccccc
 ccccccccccccccccccccccccccccccccccccccccccc
 cc""""c""""""c"""""{""""c""""""""c"""""""cc
 cc""""c"""""TcT""""""""TcT""""""TcT""""""cc
-cc""""c"""2"T+T""""""""T+T""2"""T+T""""""cc
+cc"D""c"""2"T+T""""""""T+T""2"""T+T"""E""cc
 cc"""TcT""""TcT""""""""TcT""""""TcT""""""cc
 cc""TT+T"""""c""""""""""c""""""""c"""""""cc
 ccccc+ccccccccccccccccccccccccccccccc""""cc
 cc""TTcBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc"3""cc
 cc""""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc""""cc
-cc""3"cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc"""fcc
+cc""3"cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc""""cc
 cc""""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc""""cc
-cc""""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc)""}cc
+cc""""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc""">cc
 cc""""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBccccccc
 cc""""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc''''cc
-cce"""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBcT'''cc
+cc""""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBcT'''cc
 cc""""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBB+T'''cc
-cc]""dcBBBBBBBBBBBBBBBBBBBBBBBBBBBBBcT'''cc
+cc>"""cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBcT'''cc
 cccccccBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc''''cc
 cc''''cBBBBBBBBBBBBBBBBBBBBBBBBBBBBBc'QQQcc
 cc'''TcBBBBBBBBBBBBBBBBBBBBBBBBBBBBBcccqccc
@@ -801,6 +810,8 @@ TAGS: tomb_2_ambush unrand
 MONS: mummy / skeletal warrior w:2
 : tomb_guardian_set(_G)
 : tomb_mummy_priest_set(_G)
+MARKER: Z = lua:hatch_dest_name("tomb_2_ambush")
+SUBST: Z = .
 MAP
 .............................
 .............................
@@ -812,7 +823,7 @@ MAP
 .............................
 ........x...........x........
 .............................
-.....3........(........3.....
+.....3........Z........3.....
 .............................
 ........x...........x........
 .............................
@@ -833,6 +844,8 @@ MONS:    mummy / skeletal warrior w:2
 : tomb_mummy_priest_set(_G)
 SHUFFLE: AB / Ad / dA, CD / Ce / eC, EF / Ef / fE
 SUBST:   ABCDEF = x, def = .
+MARKER: Z = lua:hatch_dest_name("tomb_2_ambush")
+SUBST: Z = .
 MAP
 .............................
 ............DD.CC............
@@ -845,7 +858,7 @@ MAP
 ......C....2.....2....D......
 .....CC...............DD.....
 .....C.................D.....
-.......1......(......1.......
+.......1......Z......1.......
 .....D.................C.....
 .....DD...............CC.....
 ......D....2.....2....C......
@@ -863,6 +876,8 @@ TAGS: tomb_2_ambush unrand
 MONS: mummy / skeletal warrior w:2
 : tomb_guardian_set(_G)
 : tomb_mummy_priest_set(_G)
+MARKER: Z = lua:hatch_dest_name("tomb_2_ambush")
+SUBST: Z = .
 MAP
 .............................
 .............................
@@ -874,7 +889,7 @@ MAP
 ........2x.........x2........
 ........x...........x........
 .......x.............x.......
-.......x3.....(.....3x.......
+.......x3.....Z.....3x.......
 .......x.............x.......
 ........x...........x........
 ........2x.........x2........
@@ -893,6 +908,8 @@ TAGS: tomb_2_ambush unrand
 MONS: mummy / skeletal warrior w:2
 : tomb_guardian_set(_G)
 : tomb_mummy_priest_set(_G)
+MARKER: Z = lua:hatch_dest_name("tomb_2_ambush")
+SUBST: Z = .
 MAP
 .............................
 ..............x..............
@@ -904,7 +921,7 @@ MAP
 ...xx...................xx...
 .............................
 .............................
-..3.xx........(........xx.3..
+..3.xx........Z........xx.3..
 .............................
 .............................
 ...xx...................xx...
@@ -940,6 +957,11 @@ KITEM:    * = * no_pickup
 NSUBST:   | = 1:d / *:|
 ITEM:     figurine of a ziggurat no_pickup
 KITEM:    | = | no_pickup
+MARKER:   D = lua:hatch_dest_name("tomb_3_ambush")
+SHUFFLE:  EF
+MARKER:   E = lua:hatch_name("tomb_3_escape_1")
+MARKER:   F = lua:hatch_name("tomb_3_escape_2")
+SUBST:    EF = <
 MAP
 ccccccccccccccccccccccccccccccccccccccccccc
 cAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAc
@@ -974,9 +996,9 @@ cccc|||||$'"""""""c......c""""'$$$$$$$$cccc
 ccccc||||$$'""""""c......c""""'$$$$$$$ccccc
 cccccc||||$'""""""c......c""""'$$$$$$cccccc
 ccccccc|||$$'"""""c......c"""'$$$$$$ccccccc
-cccccccc|||$'""""cc..{...cc""'$$$$$cccccccc
-ccccccccc||$'""""cc...(..cc"'$$$$$ccccccccc
-cccccccccc|$'""cccc..[...cccc$$$$cccccccccc
+cccccccc|||$'""""cc......cc""'$$$$$cccccccc
+ccccccccc||$'"""Ecc..D...ccF'$$$$$ccccccccc
+cccccccccc|$'""cccc......cccc$$$$cccccccccc
 ccccccccccccccccccccccccccccccccccccccccccc
 ccccccccccccccccccccccccccccccccccccccccccc
 ENDMAP
