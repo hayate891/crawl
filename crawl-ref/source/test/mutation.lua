@@ -1,6 +1,6 @@
 local silent = false -- change to false to look at the result of stress tests
 local mut_iterations = 500 -- mutate each try this many times
-local tries = 50
+local tries = 40
 
 local chance_temporary = 10 -- in 100.
 local chance_clear = 2 -- in 100. Chance to clear some temporary mutations. Note that some mutations clear others anyways.
@@ -23,6 +23,16 @@ end
 local function give_random_mutation(chance_temporary)
     local temp = crawl.x_chance_in_y(chance_temporary, 100)
     you.mutate("any", "mutation test", temp)
+end
+
+local function try_all_mutation_categories()
+    you.mutate("any", "mutation test", false)
+    you.mutate("good", "mutation test", false)
+    you.mutate("bad", "mutation test", false)
+    you.mutate("xom", "mutation test", false)
+    you.mutate("slime", "mutation test", false)
+    you.mutate("corrupt", "mutation test", true)
+    you.mutate("qazlal", "mutation test", false)
 end
 
 -- TODO: better way to do this in lua so that it doesn't duplicate code
@@ -91,5 +101,6 @@ local function test_random_mutations(tries, iterations, chance_temporary, chance
 end
 
 test_basic_mutation_stuff()
+try_all_mutation_categories()
 test_potion(tries, mut_iterations)
 test_random_mutations(tries, mut_iterations, chance_temporary, chance_clear)

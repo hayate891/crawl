@@ -1405,6 +1405,12 @@ bool mutate(mutation_type which_mutation, const string &reason, bool failMsg,
     while (count-- > 0)
     {
         you.mutation[mutat]++;
+        if (mutclass == MUTCLASS_TEMPORARY)
+        {
+            // do book-keeping for temporary mutations
+            you.temp_mutation[mutat]++;
+            you.attribute[ATTR_TEMP_MUTATIONS]++;
+        }
         const int cur_base_level = get_base_mutation_level(mutat);
 
         // More than three messages, need to give them by hand.
@@ -1551,10 +1557,8 @@ bool mutate(mutation_type which_mutation, const string &reason, bool failMsg,
         }
         else
         {
-            // do book-keeping for temporary mutations
-            ASSERT(levels == 1); // shouldn't ever increment a temp mutation by more than 1 at a time
-            you.temp_mutation[mutat]++;
-            you.attribute[ATTR_TEMP_MUTATIONS]++;
+            ASSERT(levels == 1 || which_mutation == RANDOM_CORRUPT_MUTATION); // shouldn't ever increment a temp mutation by more than 1 at a time
+            // only do this once regardless of how many levels got added
             you.attribute[ATTR_TEMP_MUT_XP] = temp_mutation_roll();
         }
 
