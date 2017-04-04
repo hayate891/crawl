@@ -21,6 +21,7 @@
 #include "misc.h"
 #include "monster.h"
 #include "mon-util.h"
+#include "mutation.h"
 #include "notes.h"
 #include "ouch.h"
 #include "player.h"

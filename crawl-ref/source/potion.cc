@@ -670,17 +670,17 @@ public:
  * to drink a mutation-causing potion?
  * @param reason Pointer to a string where the reason will be stored if unable
  *               to mutate
- * @returns True if the player is able to mutate now.
+ * @returns True if the player is unable to mutate now.
  */
 static bool _disallow_mutate(string *reason)
 {
-    if (!undead_mutation_rot())
+    if (you.can_safely_mutate())
         return false;
 
     if (reason)
     {
         *reason = make_stringf("You cannot mutate%s.",
-                               !you.undead_state(false) ? " at present" : "");
+                               you.can_safely_mutate(false) ? "" : " at present");
     }
     return true;
 }

@@ -32,6 +32,7 @@
 #include "mon-clone.h"
 #include "mon-death.h"
 #include "mon-poly.h"
+#include "mutation.h"
 #include "nearby-danger.h"
 #include "pronoun-type.h"
 #include "religion.h"

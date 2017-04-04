@@ -21,6 +21,7 @@
 #include "mon-behv.h"
 #include "mon-death.h"
 #include "mon-transit.h"
+#include "mutation.h"
 #include "religion.h"
 #include "state.h"
 #include "view.h"

@@ -9,6 +9,7 @@
 #include "describe.h"
 #include "item-name.h"
 #include "item-prop.h"
+#include "mutation.h"
 #include "player.h"
 #include "tile-flags.h"
 #include "tile-player-flag-cut.h"

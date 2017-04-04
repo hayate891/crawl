@@ -27,6 +27,7 @@
 #include "item-prop.h"
 #include "item-use.h"
 #include "message.h"
+#include "mutation.h"
 #include "player-stats.h"
 #include "religion.h"
 #include "spl-damage.h"

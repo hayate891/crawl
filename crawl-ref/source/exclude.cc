@@ -20,6 +20,7 @@
 #include "libutil.h"
 #include "map-knowledge.h"
 #include "mon-util.h"
+#include "mutation.h"
 #include "options.h"
 #include "stringutil.h"
 #include "tags.h"

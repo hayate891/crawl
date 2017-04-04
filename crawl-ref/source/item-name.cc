@@ -39,6 +39,7 @@
 #include "level-state-type.h"
 #include "libutil.h"
 #include "makeitem.h"
+#include "mutation.h"
 #include "notes.h"
 #include "options.h"
 #include "orb-type.h"

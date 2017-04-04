@@ -29,6 +29,7 @@
 #include "libutil.h"
 #include "macro.h"
 #include "message.h"
+#include "mutation.h"
 #include "output.h"
 #include "randbook.h"
 #include "random.h"

@@ -2527,40 +2527,9 @@ static string _dragon_abil(string desc)
     return _annotate_form_based(desc, supp);
 }
 
-/// Creates rows of short descriptions for current status effects, mutations,
-/// and runes/Orbs of Zot.
-static string _status_mut_rune_list(int sw)
+string mutation_overview()
 {
-    // print status information
-    string text = "<w>@:</w> ";
-    vector<string> status;
-
-    status_info inf;
-    for (unsigned i = 0; i <= STATUS_LAST_STATUS; ++i)
-    {
-        if (fill_status_info(i, &inf) && !inf.short_text.empty())
-            status.emplace_back(inf.short_text);
-    }
-
-    int move_cost = (player_speed() * player_movement_speed()) / 10;
-    if (move_cost != 10)
-    {
-        const char *help = (move_cost <   8) ? "very quick" :
-                           (move_cost <  10) ? "quick" :
-                           (move_cost <  13) ? "slow"
-                                             : "very slow";
-        status.emplace_back(help);
-    }
-
-    if (status.empty())
-        text += "no status effects";
-    else
-        text += comma_separated_line(status.begin(), status.end(), ", ", ", ");
-    text += "\n";
-
-    // print mutation information
-    text += "<w>A:</w> ";
-
+    string mtext;
     vector<string> mutations;
 
     for (const string& str : fake_mutations(you.species, true))
@@ -2613,22 +2582,40 @@ static string _status_mut_rune_list(int sw)
             continue;
 
         const mutation_type mut = (mutation_type) i;
-        const int level = player_mutation_level(mut);
-        const bool lowered = level < you.mutation[mut];
+        const int current_level = player_mutation_level(mut);
+        const int base_level = get_base_mutation_level(mut);
+        const bool lowered = current_level < base_level;
+        const int temp_levels = get_base_mutation_level(mut, false, true, false); // only temp levels
+        const int ordinary_levels = get_base_mutation_level(mut, true, false, true); // excluding temp levels
+
+        const int max_levels = mutation_max_levels(mut);
 
         current = mutation_name(mut);
 
-        if (mutation_max_levels(mut) > 1)
+        if (max_levels > 1)
         {
+            // add on any numeric levels
             ostringstream ostr;
-            ostr << ' ' << level;
-
+            ostr << " ";
+            if (ordinary_levels == 0) // only temporary levels are present
+                ostr << temp_levels;
+            else
+            {
+                // at least some non-temporary levels
+                ostr << ordinary_levels;
+                if (temp_levels)
+                    ostr << "+[" << temp_levels << "]";
+            }
             current += ostr.str();
         }
 
+        // bracket the whole thing
+        if (ordinary_levels == 0)
+            current = "[" + current + "]";
+
         if (!current.empty())
         {
-            if (level == 0)
+            if (current_level == 0) // suppressed by form
                 current = "(" + current + ")";
             if (lowered)
                 current = "<darkgrey>" + current + "</darkgrey>";
@@ -2640,12 +2627,50 @@ static string _status_mut_rune_list(int sw)
         mutations.push_back("AC +" + to_string(you.racial_ac(false) / 100));
 
     if (mutations.empty())
-        text += "no striking features";
+        mtext += "no striking features";
     else
     {
-        text += comma_separated_line(mutations.begin(), mutations.end(),
+        mtext += comma_separated_line(mutations.begin(), mutations.end(),
                                      ", ", ", ");
     }
+    return mtext;
+}
+
+/// Creates rows of short descriptions for current status effects, mutations,
+/// and runes/Orbs of Zot.
+string _status_mut_rune_list(int sw)
+{
+    // print status information
+    string text = "<w>@:</w> ";
+    vector<string> status;
+
+    status_info inf;
+    for (unsigned i = 0; i <= STATUS_LAST_STATUS; ++i)
+    {
+        if (fill_status_info(i, &inf) && !inf.short_text.empty())
+            status.emplace_back(inf.short_text);
+    }
+
+    int move_cost = (player_speed() * player_movement_speed()) / 10;
+    if (move_cost != 10)
+    {
+        const char *help = (move_cost <   8) ? "very quick" :
+                           (move_cost <  10) ? "quick" :
+                           (move_cost <  13) ? "slow"
+                                             : "very slow";
+        status.emplace_back(help);
+    }
+
+    if (status.empty())
+        text += "no status effects";
+    else
+        text += comma_separated_line(status.begin(), status.end(), ", ", ", ");
+    text += "\n";
+
+    // print mutation information
+    text += "<w>A:</w> ";
+
+    text += mutation_overview();
 
     // print the Orb
     if (player_has_orb())

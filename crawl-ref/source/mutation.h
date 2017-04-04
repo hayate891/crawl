@@ -35,6 +35,15 @@ bool is_body_facet(mutation_type mut);
 bool is_slime_mutation(mutation_type mut);
 bool undead_mutation_rot();
 
+// canonical ways of getting information about particular mutations
+bool has_temporary_mutation(mutation_type i);
+bool has_innate_mutation(mutation_type i);
+int get_base_mutation_level(mutation_type i, bool innate=true, bool temp=true, bool normal=true);
+
+// versions that incorporate information about current player state, e.g. forms.
+int player_mutation_level_threshold(mutation_type mut, mutation_activity_type minact);
+int player_mutation_level(mutation_type mut, bool check_form = true);
+
 bool mutate(mutation_type which_mutation, const string &reason,
             bool failMsg = true,
             bool force_mutation = false, bool god_gift = false,
@@ -54,7 +63,10 @@ bool delete_mutation(mutation_type which_mutation, const string &reason,
 
 bool delete_all_mutations(const string &reason);
 
-const char* mutation_name(mutation_type mut);
+const char* mutation_name(mutation_type mut, bool allow_special = false);
+const char* special_mutation_name(mutation_type mut);
+mutation_type mutation_from_name(string name, bool allow_special, vector<mutation_type> *partial_matches = nullptr);
+
 string mut_upgrade_summary(mutation_type mut);
 int mutation_max_levels(mutation_type mut);
 string mutation_desc(mutation_type which_mutat, int level = -1,
@@ -65,6 +77,8 @@ void roll_demonspawn_mutations();
 bool perma_mutate(mutation_type which_mut, int how_much, const string &reason);
 bool temp_mutate(mutation_type which_mut, const string &reason);
 int temp_mutation_roll();
+bool temp_mutation_wanes();
+
 int how_mutated(bool innate = false, bool levels = false, bool temp = true);
 
 void check_demonic_guardian();
@@ -74,4 +88,5 @@ bool physiology_mutation_conflict(mutation_type mutat);
 int augmentation_amount();
 void reset_powered_by_death_duration();
 
+bool delete_all_temp_mutations(const string &reason);
 bool delete_temp_mutation();

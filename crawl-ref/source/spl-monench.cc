@@ -10,6 +10,7 @@
 
 #include "env.h"
 #include "message.h"
+#include "mutation.h"
 #include "spl-util.h"
 #include "terrain.h"
 

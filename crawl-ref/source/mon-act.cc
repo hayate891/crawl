@@ -49,6 +49,7 @@
 #include "mon-project.h"
 #include "mon-speak.h"
 #include "mon-tentacle.h"
+#include "mutation.h"
 #include "nearby-danger.h"
 #include "religion.h"
 #include "rot.h"

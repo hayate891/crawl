@@ -37,6 +37,7 @@
 #include "mon-behv.h"
 #include "mon-poly.h"
 #include "mon-tentacle.h"
+#include "mutation.h"
 #include "religion.h"
 #include "shout.h"
 #include "spl-summoning.h"

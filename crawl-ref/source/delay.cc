@@ -45,6 +45,7 @@
 #include "mon-behv.h"
 #include "mon-tentacle.h"
 #include "mon-util.h"
+#include "mutation.h"
 #include "nearby-danger.h"
 #include "notes.h"
 #include "options.h"

@@ -34,6 +34,7 @@
 #include "mon-place.h"
 #include "mon-tentacle.h"
 #include "mon-util.h"
+#include "mutation.h"
 #include "nearby-danger.h"
 #include "orb.h"
 #include "output.h"

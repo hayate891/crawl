@@ -32,6 +32,7 @@
 #include "mon-cast.h"
 #include "mon-place.h"
 #include "mon-util.h"
+#include "mutation.h"
 #include "output.h"
 #include "religion.h"
 #include "shout.h"

@@ -18,6 +18,7 @@
 #include "los.h"
 #include "mon-behv.h"
 #include "mon-death.h"
+#include "mutation.h"
 #include "religion.h"
 #include "stepdown.h"
 #include "stringutil.h"

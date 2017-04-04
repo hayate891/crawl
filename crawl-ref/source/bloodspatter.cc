@@ -12,6 +12,7 @@
 #include "env.h"
 #include "fprop.h"
 #include "losglobal.h"
+#include "mutation.h"
 #include "religion.h"
 #include "shout.h"
 #include "terrain.h"

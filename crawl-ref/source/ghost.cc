@@ -19,6 +19,7 @@
 #include "mon-book.h"
 #include "mon-cast.h"
 #include "mon-transit.h"
+#include "mutation.h"
 #include "ng-input.h"
 #include "skills.h"
 #include "spl-util.h"

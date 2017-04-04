@@ -38,6 +38,7 @@
 #include "mon-pick.h"
 #include "mon-poly.h"
 #include "mon-tentacle.h"
+#include "mutation.h"
 #include "options.h"
 #include "random.h"
 #include "religion.h"

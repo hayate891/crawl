@@ -46,6 +46,7 @@
 #include "mon-movetarget.h"
 #include "mon-place.h"
 #include "mon-speak.h"
+#include "mutation.h"
 #include "options.h"
 #include "player-equip.h"
 #include "player-stats.h"

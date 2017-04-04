@@ -25,6 +25,7 @@
 #include "libutil.h"
 #include "message.h"
 #include "misc.h"
+#include "mutation.h"
 #include "notes.h"
 #include "output.h"
 #include "random.h"

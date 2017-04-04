@@ -32,6 +32,7 @@
 #include "libutil.h"
 #include "macro.h"
 #include "message.h"
+#include "mutation.h"
 #include "options.h"
 #include "output.h"
 #include "prompt.h"

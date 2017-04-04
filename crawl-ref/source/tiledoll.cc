@@ -8,6 +8,7 @@
 
 #include "files.h"
 #include "mon-info.h"
+#include "mutation.h"
 #include "options.h"
 #include "syscalls.h"
 #include "tile-player-flag-cut.h"

@@ -13,6 +13,12 @@ struct mutation_def
     const char* lose[3];    ///< Message when you lose the mutation.
 };
 
+struct mutation_special_def
+{
+  mutation_type mutation;
+  const char* short_desc;
+};
+
 static const mutation_def mut_data[] =
 {
 
@@ -1908,4 +1914,16 @@ static const mutation_def mut_data[] =
   {"You stop regenerating.", "", ""},
   {"You start regenerating.", "", ""},
 },
+};
+
+static const mutation_special_def special_mut_data[] =
+{
+  { RANDOM_MUTATION, "any"},
+  { RANDOM_XOM_MUTATION, "xom"},
+  { RANDOM_GOOD_MUTATION, "good"},
+  { RANDOM_BAD_MUTATION, "bad"},
+  { RANDOM_SLIME_MUTATION, "slime"},
+  { RANDOM_NON_SLIME_MUTATION, "nonslime"},
+  { RANDOM_CORRUPT_MUTATION, "corrupt"},
+  { RANDOM_QAZLAL_MUTATION, "qazlal"},
 };

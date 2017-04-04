@@ -30,6 +30,7 @@
 #include "mon-behv.h"
 #include "mon-place.h"
 #include "mon-poly.h"
+#include "mutation.h"
 #include "prompt.h"
 #include "religion.h"
 #include "state.h"

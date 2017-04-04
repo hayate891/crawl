@@ -24,6 +24,7 @@
 #include "lookup-help.h"
 #include "macro.h"
 #include "message.h"
+#include "mutation.h"
 #include "output.h"
 #include "prompt.h"
 #include "showsymb.h"

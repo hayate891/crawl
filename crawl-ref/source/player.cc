@@ -2005,27 +2005,6 @@ int player_speed()
     return ps;
 }
 
-// Get level of player mutation, ignoring mutations with an activity level
-// less than minact.
-static int _mut_level(mutation_type mut, mutation_activity_type minact)
-{
-    const int mlevel = you.mutation[mut];
-
-    const mutation_activity_type active = mutation_activity_level(mut);
-
-    if (active >= minact)
-        return mlevel;
-
-    return 0;
-}
-
-// Output level of player mutation. If temp is true (the default), take into
-// account the suppression of mutations by changes of form.
-int player_mutation_level(mutation_type mut, bool temp)
-{
-    return _mut_level(mut, temp ? MUTACT_PARTIAL : MUTACT_INACTIVE);
-}
-
 bool is_effectively_light_armour(const item_def *item)
 {
     return !item
@@ -2385,24 +2364,6 @@ void forget_map(bool rot)
 #endif
 }
 
-static void _remove_temp_mutation()
-{
-    int num_remove = min(you.attribute[ATTR_TEMP_MUTATIONS],
-        max(you.attribute[ATTR_TEMP_MUTATIONS] * 5 / 12 - random2(3),
-        1 + random2(3)));
-
-    if (num_remove >= you.attribute[ATTR_TEMP_MUTATIONS])
-        mprf(MSGCH_DURATION, "You feel the corruption within you wane completely.");
-    else
-        mprf(MSGCH_DURATION, "You feel the corruption within you wane somewhat.");
-
-    for (int i = 0; i < num_remove; ++i)
-        delete_temp_mutation();
-
-    if (you.attribute[ATTR_TEMP_MUTATIONS] > 0)
-        you.attribute[ATTR_TEMP_MUT_XP] += temp_mutation_roll();
-}
-
 static void _recover_stat()
 {
     FixedVector<int, NUM_STATS> recovered_stats(0);
@@ -2546,7 +2507,7 @@ static void _handle_temp_mutation(int exp)
 
     you.attribute[ATTR_TEMP_MUT_XP] -= exp;
     if (you.attribute[ATTR_TEMP_MUT_XP] <= 0)
-        _remove_temp_mutation();
+        temp_mutation_wanes();
 }
 
 /// update stat loss
@@ -5923,29 +5884,29 @@ int player::base_ac(int scale) const
     AC += player_mutation_level(MUT_GELATINOUS_BODY)
           ? player_mutation_level(MUT_GELATINOUS_BODY) * 100 : 0;
               // +1, +2, +3
-    AC += _mut_level(MUT_IRIDESCENT_SCALES, MUTACT_FULL) * 200;
+    AC += player_mutation_level_threshold(MUT_IRIDESCENT_SCALES, MUTACT_FULL) * 200;
               // +2, +4, +6
 #if TAG_MAJOR_VERSION == 34
-    AC += _mut_level(MUT_ROUGH_BLACK_SCALES, MUTACT_FULL)
-          ? -100 + _mut_level(MUT_ROUGH_BLACK_SCALES, MUTACT_FULL) * 300 : 0;
+    AC += player_mutation_level_threshold(MUT_ROUGH_BLACK_SCALES, MUTACT_FULL)
+          ? -100 + player_mutation_level_threshold(MUT_ROUGH_BLACK_SCALES, MUTACT_FULL) * 300 : 0;
               // +2, +5, +8
 #endif
-    AC += _mut_level(MUT_RUGGED_BROWN_SCALES, MUTACT_FULL) * 100;
+    AC += player_mutation_level_threshold(MUT_RUGGED_BROWN_SCALES, MUTACT_FULL) * 100;
               // +1, +2, +3
-    AC += _mut_level(MUT_ICY_BLUE_SCALES, MUTACT_FULL)
-          ? 100 + _mut_level(MUT_ICY_BLUE_SCALES, MUTACT_FULL) * 100 : 0;
+    AC += player_mutation_level_threshold(MUT_ICY_BLUE_SCALES, MUTACT_FULL)
+          ? 100 + player_mutation_level_threshold(MUT_ICY_BLUE_SCALES, MUTACT_FULL) * 100 : 0;
               // +2, +3, +4
-    AC += _mut_level(MUT_MOLTEN_SCALES, MUTACT_FULL)
-          ? 100 + _mut_level(MUT_MOLTEN_SCALES, MUTACT_FULL) * 100 : 0;
+    AC += player_mutation_level_threshold(MUT_MOLTEN_SCALES, MUTACT_FULL)
+          ? 100 + player_mutation_level_threshold(MUT_MOLTEN_SCALES, MUTACT_FULL) * 100 : 0;
               // +2, +3, +4
-    AC += _mut_level(MUT_SLIMY_GREEN_SCALES, MUTACT_FULL)
-          ? 100 + _mut_level(MUT_SLIMY_GREEN_SCALES, MUTACT_FULL) * 100 : 0;
+    AC += player_mutation_level_threshold(MUT_SLIMY_GREEN_SCALES, MUTACT_FULL)
+          ? 100 + player_mutation_level_threshold(MUT_SLIMY_GREEN_SCALES, MUTACT_FULL) * 100 : 0;
               // +2, +3, +4
-    AC += _mut_level(MUT_THIN_METALLIC_SCALES, MUTACT_FULL)
-          ? 100 + _mut_level(MUT_THIN_METALLIC_SCALES, MUTACT_FULL) * 100 : 0;
+    AC += player_mutation_level_threshold(MUT_THIN_METALLIC_SCALES, MUTACT_FULL)
+          ? 100 + player_mutation_level_threshold(MUT_THIN_METALLIC_SCALES, MUTACT_FULL) * 100 : 0;
               // +2, +3, +4
-    AC += _mut_level(MUT_YELLOW_SCALES, MUTACT_FULL)
-          ? 100 + _mut_level(MUT_YELLOW_SCALES, MUTACT_FULL) * 100 : 0;
+    AC += player_mutation_level_threshold(MUT_YELLOW_SCALES, MUTACT_FULL)
+          ? 100 + player_mutation_level_threshold(MUT_YELLOW_SCALES, MUTACT_FULL) * 100 : 0;
               // +2, +3, +4
     AC -= player_mutation_level(MUT_PHYSICAL_VULNERABILITY)
           ? player_mutation_level(MUT_PHYSICAL_VULNERABILITY) * 500 : 0;
@@ -8163,8 +8124,9 @@ void player_end_berserk()
  */
 bool sanguine_armour_valid()
 {
+    // why can't this just call player_mutation_level?
     return you.hp <= you.hp_max * 2 / 3
-           && _mut_level(MUT_SANGUINE_ARMOUR, MUTACT_FULL);
+           && player_mutation_level_threshold(MUT_SANGUINE_ARMOUR, MUTACT_FULL);
 }
 
 /// Trigger sanguine armour, updating the duration & messaging as appropriate.
