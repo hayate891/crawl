@@ -751,7 +751,7 @@ static void _spirit_shield_message(bool unmeld)
             mpr("Now linked to your health, your magic stops regenerating.");
         }
     }
-    else if (!unmeld && player_mutation_level(MUT_MANA_SHIELD))
+    else if (!unmeld && you.get_mutation_level(MUT_MANA_SHIELD))
         mpr("You feel the presence of a powerless spirit.");
     else // unmeld or already spirit-shielded
         mpr("You feel spirits watching over you.");
@@ -813,7 +813,7 @@ static void _equip_armour_effect(item_def& arm, bool unmeld,
         case SPARM_FLYING:
             // If you weren't flying when you took off the boots, don't restart.
             if (you.attribute[ATTR_LAST_FLIGHT_STATUS]
-                || player_mutation_level(MUT_NO_ARTIFICE))
+                || you.has_mutation(MUT_NO_ARTIFICE))
             {
                 if (you.airborne())
                 {
@@ -826,9 +826,9 @@ static void _equip_armour_effect(item_def& arm, bool unmeld,
                     float_player();
                 }
             }
-            if (!unmeld && !player_mutation_level(MUT_NO_ARTIFICE))
+            if (!unmeld && !you.has_mutation(MUT_NO_ARTIFICE))
             {
-                if (player_mutation_level(MUT_NO_ARTIFICE))
+                if (you.has_mutation(MUT_NO_ARTIFICE))
                     mpr("Take it off to stop flying.");
                 else
                 {
@@ -850,7 +850,7 @@ static void _equip_armour_effect(item_def& arm, bool unmeld,
             break;
 
         case SPARM_STEALTH:
-            if (!player_mutation_level(MUT_NO_STEALTH))
+            if (!you.get_mutation_level(MUT_NO_STEALTH))
                 mpr("You feel stealthy.");
             break;
 
@@ -1015,7 +1015,7 @@ static void _unequip_armour_effect(item_def& item, bool meld,
         break;
 
     case SPARM_STEALTH:
-        if (!player_mutation_level(MUT_NO_STEALTH))
+        if (!you.get_mutation_level(MUT_NO_STEALTH))
             mpr("You feel less stealthy.");
         break;
 
@@ -1101,7 +1101,7 @@ static void _remove_amulet_of_harm()
 
 static void _equip_amulet_of_regeneration()
 {
-    if (player_mutation_level(MUT_NO_REGENERATION) > 0)
+    if (you.get_mutation_level(MUT_NO_REGENERATION) > 0)
         mpr("The amulet feels cold and inert.");
     else if (you.hp == you.hp_max)
     {

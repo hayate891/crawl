@@ -199,7 +199,7 @@ static int _mut_weight(const mutation_def &mut, mutflag use)
 }
 
 static int mut_index[NUM_MUTATIONS];
-static int special_mut_index[MUT_NON_MUTATION - SPECIAL_MUTATIONS];
+static int category_mut_index[MUT_NON_MUTATION - CATEGORY_MUTATIONS];
 static map<mutflag, int> total_weight;
 
 void init_mut_index()
@@ -222,15 +222,15 @@ void init_mut_index()
     }
 
     // this is all a bit silly but ok
-    for (int i = 0; i < MUT_NON_MUTATION - SPECIAL_MUTATIONS; ++i)
-        special_mut_index[i] = -1;
+    for (int i = 0; i < MUT_NON_MUTATION - CATEGORY_MUTATIONS; ++i)
+        category_mut_index[i] = -1;
 
-    for (unsigned int i = 0; i < ARRAYSZ(special_mut_data); ++i)
+    for (unsigned int i = 0; i < ARRAYSZ(category_mut_data); ++i)
     {
-        const mutation_type mut = special_mut_data[i].mutation;
-        ASSERT_RANGE(mut, SPECIAL_MUTATIONS, MUT_NON_MUTATION);
-        ASSERT(special_mut_index[mut-SPECIAL_MUTATIONS] == -1);
-        special_mut_index[mut-SPECIAL_MUTATIONS] = i;
+        const mutation_type mut = category_mut_data[i].mutation;
+        ASSERT_RANGE(mut, CATEGORY_MUTATIONS, MUT_NON_MUTATION);
+        ASSERT(category_mut_index[mut-CATEGORY_MUTATIONS] == -1);
+        category_mut_index[mut-CATEGORY_MUTATIONS] = i;
     }
 }
 
@@ -241,11 +241,11 @@ static const mutation_def& _get_mutation_def(mutation_type mut)
     return mut_data[mut_index[mut]];
 }
 
-static const mutation_special_def& _get_special_mutation_def(mutation_type mut)
+static const mutation_category_def& _get_category_mutation_def(mutation_type mut)
 {
-    ASSERT_RANGE(mut, SPECIAL_MUTATIONS, MUT_NON_MUTATION);
-    ASSERT(special_mut_index[mut-SPECIAL_MUTATIONS] != -1);
-    return special_mut_data[special_mut_index[mut-SPECIAL_MUTATIONS]];
+    ASSERT_RANGE(mut, CATEGORY_MUTATIONS, MUT_NON_MUTATION);
+    ASSERT(category_mut_index[mut-CATEGORY_MUTATIONS] != -1);
+    return category_mut_data[category_mut_index[mut-CATEGORY_MUTATIONS]];
 }
 
 static bool _is_valid_mutation(mutation_type mut)
@@ -284,7 +284,9 @@ bool is_body_facet(mutation_type mut)
  *
  * @param mut  the mutation to check.
  *
- * @return  MUTACT_FULL: completely available. MUTACT_PARTIAL: partially suppressed. MUTACT_INACTIVE: completely suppressed.
+ * @return  mutation_activity_type::FULL: completely available.
+ *          mutation_activity_type::PARTIAL: partially suppressed.
+ *          mutation_activity_type::INACTIVE: completely suppressed.
  */
 mutation_activity_type mutation_activity_level(mutation_type mut)
 {
@@ -295,30 +297,30 @@ mutation_activity_type mutation_activity_level(mutation_type mut)
         {
             monster_type drag = dragon_form_dragon_type();
             if (mut == MUT_SHOCK_RESISTANCE && drag == MONS_STORM_DRAGON)
-                return MUTACT_FULL;
+                return mutation_activity_type::FULL;
             if (mut == MUT_UNBREATHING && drag == MONS_IRON_DRAGON)
-                return MUTACT_FULL;
+                return mutation_activity_type::FULL;
             if (mut == MUT_ACIDIC_BITE && drag == MONS_GOLDEN_DRAGON)
-                return MUTACT_FULL;
+                return mutation_activity_type::FULL;
             if (mut == MUT_STINGER && drag == MONS_SWAMP_DRAGON)
-                return MUTACT_FULL;
+                return mutation_activity_type::FULL;
         }
         // Vampire bats keep their fangs.
         if (you.form == transformation::bat
             && you.species == SP_VAMPIRE
             && mut == MUT_FANGS)
         {
-            return MUTACT_FULL;
+            return mutation_activity_type::FULL;
         }
         // Dex and HP changes are kept in all forms.
 #if TAG_MAJOR_VERSION == 34
         if (mut == MUT_ROUGH_BLACK_SCALES)
-            return MUTACT_PARTIAL;
+            return mutation_activity_type::PARTIAL;
 #endif
         if (mut == MUT_RUGGED_BROWN_SCALES)
-            return MUTACT_PARTIAL;
+            return mutation_activity_type::PARTIAL;
         else if (_get_mutation_def(mut).form_based)
-            return MUTACT_INACTIVE;
+            return mutation_activity_type::INACTIVE;
     }
 
     if (you.form == transformation::statue)
@@ -333,19 +335,20 @@ mutation_activity_type mutation_activity_level(mutation_type mut)
         case MUT_FAST:
         case MUT_SLOW:
         case MUT_IRIDESCENT_SCALES:
-            return MUTACT_INACTIVE;
+            return mutation_activity_type::INACTIVE;
         case MUT_LARGE_BONE_PLATES:
 #if TAG_MAJOR_VERSION == 34
         case MUT_ROUGH_BLACK_SCALES:
 #endif
         case MUT_RUGGED_BROWN_SCALES:
-            return MUTACT_PARTIAL;
+            return mutation_activity_type::PARTIAL;
         case MUT_YELLOW_SCALES:
         case MUT_ICY_BLUE_SCALES:
         case MUT_MOLTEN_SCALES:
         case MUT_SLIMY_GREEN_SCALES:
         case MUT_THIN_METALLIC_SCALES:
-            return get_base_mutation_level(mut) > 2 ? MUTACT_PARTIAL : MUTACT_INACTIVE;
+            return you.get_base_mutation_level(mut) > 2 ? mutation_activity_type::PARTIAL :
+                                                          mutation_activity_type::INACTIVE;
         default:
             break;
         }
@@ -353,24 +356,24 @@ mutation_activity_type mutation_activity_level(mutation_type mut)
 
     //XXX: Should this make claws inactive too?
     if (you.form == transformation::blade_hands && mut == MUT_PAWS)
-        return MUTACT_INACTIVE;
+        return mutation_activity_type::INACTIVE;
 
     if (you_worship(GOD_DITHMENOS) && mut == MUT_IGNITE_BLOOD)
-        return MUTACT_INACTIVE;
+        return mutation_activity_type::INACTIVE;
 
     if ((you_worship(GOD_PAKELLAS) || player_under_penance(GOD_PAKELLAS))
          && (mut == MUT_MANA_LINK || mut == MUT_MANA_REGENERATION))
     {
-        return MUTACT_INACTIVE;
+        return mutation_activity_type::INACTIVE;
     }
 
     if (!form_can_bleed(you.form) && mut == MUT_SANGUINE_ARMOUR)
-        return MUTACT_INACTIVE;
+        return mutation_activity_type::INACTIVE;
 
-    if (mut == MUT_DEMONIC_GUARDIAN && player_mutation_level(MUT_NO_LOVE))
-        return MUTACT_INACTIVE;
+    if (mut == MUT_DEMONIC_GUARDIAN && you.get_mutation_level(MUT_NO_LOVE))
+        return mutation_activity_type::INACTIVE;
 
-    return MUTACT_FULL;
+    return mutation_activity_type::FULL;
 }
 
 // Counts of various statuses/types of mutations from the current/most
@@ -397,51 +400,73 @@ static string _dragon_abil(string desc)
 }
 
 /*
- * Does the player have mutation `i` with at least one temporary level?
+ * Does the player have mutation `mut` with at least one temporary level?
  *
- * Reminder: temporary mutations can coexist with others.
+ * Reminder: temporary mutations can coexist with innate or normal mutations.
  */
-bool has_temporary_mutation(mutation_type i)
+bool player::has_temporary_mutation(mutation_type mut) const
 {
-    return you.temp_mutation[i] > 0;
+    return you.temp_mutation[mut] > 0;
 }
 
 /*
- * Does the player have mutation `i` with at least one innate level?
+ * Does the player have mutation `mut` with at least one innate level?
  *
- * Reminder: innate mutations can coexist with others.
+ * Reminder: innate mutations can coexist with temporary or normal mutations.
  */
-bool has_innate_mutation(mutation_type i)
+bool player::has_innate_mutation(mutation_type mut) const
 {
-    return you.innate_mutation[i] > 0;
+    return you.innate_mutation[mut] > 0;
 }
 
 /*
- * How much of mutation `i` does the player have?
+ * How much of mutation `mut` does the player have?
  * If all three bool arguments are false, this should always return 0.
  *
- * @param temp   include temporary mutation levels
- * @param innate include innate mutation levels
- * @param normal include normal (non-temp, non-innate) mutation levels
+ * @param temp   include temporary mutation levels. defaults to true.
+ * @param innate include innate mutation levels. defaults to true.
+ * @param normal include normal (non-temp, non-innate) mutation levels. defaults to true.
  *
  * @return the total levels of the mutation
  */
-int get_base_mutation_level(mutation_type i, bool innate, bool temp, bool normal)
+int player::get_base_mutation_level(mutation_type mut, bool innate, bool temp, bool normal) const
 {
-    int level = you.mutation[i];
+    ASSERT_RANGE(mut, 0, NUM_MUTATIONS);
+    // you.mutation stores the total levels of all mutations
+    int level = you.mutation[mut];
     if (!temp)
-        level -= you.temp_mutation[i];
+        level -= you.temp_mutation[mut];
     if (!innate)
-        level -= you.innate_mutation[i];
+        level -= you.innate_mutation[mut];
     if (!normal)
-        level -= (you.mutation[i] - (you.temp_mutation[i] + you.innate_mutation[i]));
+        level -= (you.mutation[mut] - (you.temp_mutation[mut] + you.innate_mutation[mut]));
     ASSERT(level >= 0);
     return level;
 }
 
 /*
+ * How much of mutation `mut` does the player have innately?
+ *
+ */
+int player::get_innate_mutation_level(mutation_type mut) const
+{
+    ASSERT_RANGE(mut, 0, NUM_MUTATIONS);
+    return you.innate_mutation[mut];
+}
+
+/*
+ * How much of mutation `mut` does the player have temporarily?
+ *
+ */
+int player::get_temp_mutation_level(mutation_type mut) const
+{
+    ASSERT_RANGE(mut, 0, NUM_MUTATIONS);
+    return you.temp_mutation[mut];
+}
+
+/*
  * Get the current player mutation level for `mut`, possibly incorporating information about forms.
- * See `player_mutation_level` for the canonical usage of `minact`; some forms such as scale mutations
+ * See `get_mutation_level` for the canonical usage of `minact`; some forms such as scale mutations
  * have different thresholds depending on the purpose and form and so will call this directly (e.g. ac
  * but not resistances are suppressed in statueform.)
  *
@@ -450,16 +475,12 @@ int get_base_mutation_level(mutation_type i, bool innate, bool temp, bool normal
  *
  * @return a mutation level, 0 if the mutation doesn't exist or is suppressed.
  */
-int player_mutation_level_threshold(mutation_type mut, mutation_activity_type minact)
+int player::get_mutation_level(mutation_type mut, mutation_activity_type minact) const
 {
-    const int mlevel = get_base_mutation_level(mut, true, true);
-
-    const mutation_activity_type active = mutation_activity_level(mut);
-
-    if (active >= minact)
-        return mlevel;
-
-    return 0;
+    ASSERT_RANGE(mut, 0, NUM_MUTATIONS);
+    if (mutation_activity_level(mut) < minact)
+        return 0;
+    return get_base_mutation_level(mut, true, true);
 }
 
 /*
@@ -470,10 +491,20 @@ int player_mutation_level_threshold(mutation_type mut, mutation_activity_type mi
  *
  * @return a mutation level, 0 if the mutation doesn't exist or is suppressed.
  */
-int player_mutation_level(mutation_type mut, bool check_form)
+int player::get_mutation_level(mutation_type mut, bool check_form) const
 {
-    return player_mutation_level_threshold(mut, check_form ? MUTACT_PARTIAL : MUTACT_INACTIVE);
+    return get_mutation_level(mut, check_form ? mutation_activity_type::PARTIAL :
+                                                            mutation_activity_type::INACTIVE);
 }
+
+/*
+ * Does the player have mutation `mut` in some form?
+ */
+bool player::has_mutation(mutation_type mut, bool check_form) const
+{
+    return get_mutation_level(mut, check_form) > 0;
+}
+
 
 string describe_mutations(bool center_title)
 {
@@ -590,7 +621,7 @@ string describe_mutations(bool center_title)
     for (int i = 0; i < NUM_MUTATIONS; i++)
     {
         mutation_type mut_type = static_cast<mutation_type>(i);
-        if (has_innate_mutation(mut_type))
+        if (you.has_innate_mutation(mut_type))
         {
             result += mutation_desc(mut_type, -1, true,
                 ((you.sacrifices[i] != 0) ? true : false));
@@ -617,8 +648,8 @@ string describe_mutations(bool center_title)
     for (int i = 0; i < NUM_MUTATIONS; i++)
     {
         mutation_type mut_type = static_cast<mutation_type>(i);
-        if (get_base_mutation_level(mut_type, false, false, true) > 0
-            && !has_innate_mutation(mut_type) && !has_temporary_mutation(mut_type))
+        if (you.get_base_mutation_level(mut_type, false, false, true) > 0
+            && !you.has_innate_mutation(mut_type) && !you.has_temporary_mutation(mut_type))
         {
             result += mutation_desc(mut_type, -1, true);
             result += "\n";
@@ -629,7 +660,7 @@ string describe_mutations(bool center_title)
     for (int i = 0; i < NUM_MUTATIONS; i++)
     {
         mutation_type mut_type = static_cast<mutation_type>(i);
-        if (has_temporary_mutation(mut_type))
+        if (you.has_temporary_mutation(mut_type))
         {
             result += mutation_desc(mut_type, -1, true);
             result += "\n";
@@ -799,13 +830,14 @@ static bool _accept_mutation(mutation_type mutat, bool ignore_weight = false)
 
     const mutation_def& mdef = _get_mutation_def(mutat);
 
-    if (get_base_mutation_level(mutat) >= mdef.levels)
+    if (you.get_base_mutation_level(mutat) >= mdef.levels)
         return false;
 
     if (ignore_weight)
         return true;
 
-    const int weight = mdef.weight + you.innate_mutation[mutat]; // ??
+    // bias towards adding (non-innate) levels to existing innate mutations.
+    const int weight = mdef.weight + you.get_innate_mutation_level(mutat);
 
     // Low weight means unlikely to choose it.
     return x_chance_in_y(weight, 10);
@@ -845,7 +877,7 @@ static mutation_type _delete_random_slime_mutation()
     {
         mutat = _get_random_slime_mutation();
 
-        if (get_base_mutation_level(mutat) > 0)
+        if (you.get_base_mutation_level(mutat) > 0)
             break;
 
         if (one_chance_in(500))
@@ -941,8 +973,7 @@ int mut_check_conflict(mutation_type mut, bool innate_only)
         const mutation_type confl_mut
            = static_cast<mutation_type>(confl[0] == mut ? confl[1] : confl[0]);
 
-        const int level = innate_only ? you.innate_mutation[confl_mut]
-                                      : get_base_mutation_level(confl_mut);
+        const int level = you.get_base_mutation_level(confl_mut, true, !innate_only, !innate_only);
         if (level)
             return level;
     }
@@ -971,20 +1002,21 @@ static int _handle_conflicting_mutations(mutation_type mutation,
             const mutation_type a = (mutation_type)confl[j];
             const mutation_type b = (mutation_type)confl[1-j];
 
-            if (mutation == a && get_base_mutation_level(b) > 0)
+            if (mutation == a && you.get_base_mutation_level(b) > 0)
             {
                 // can never delete innate mutations. For case -1 and 0, fail if there are any, otherwise,
                 // make sure there is a non-innate instance to delete.
-                if (has_innate_mutation(b) &&
+                if (you.has_innate_mutation(b) &&
                     (confl[2] != 1
-                     || get_base_mutation_level(b, true, false, false) == get_base_mutation_level(b)))
+                     || you.get_base_mutation_level(b, true, false, false) == you.get_base_mutation_level(b)))
                 {
-                    dprf("already have innate mutation %d at level %d, you.mutation at level %d", b, you.innate_mutation[b], you.mutation[b]);
+                    dprf("already have innate mutation %d at level %d, you.mutation at level %d", b,
+                        you.get_innate_mutation_level(b), you.get_base_mutation_level(b));
                     return -1;
                 }
 
                 // at least one level of this mutation is temporary
-                const bool temp_b = has_temporary_mutation(b);
+                const bool temp_b = you.has_temporary_mutation(b);
 
                 // confl[2] indicates how the mutation resolution should proceed (see `conflict` a the beginning of this file):
                 switch (confl[2])
@@ -1013,7 +1045,6 @@ static int _handle_conflicting_mutations(mutation_type mutation,
                         return 0;       // Allow conflicting transient mutations
                     else
                     {
-                        //delete_mutation(b, reason, true, true);
                         _delete_single_mutation_level(b, reason, true);
                         return 1;     // Nothing more to do.
                     }
@@ -1041,7 +1072,7 @@ static int _body_covered()
         covered += 3;
 
     for (mutation_type scale : _all_scales)
-        covered += get_base_mutation_level(scale);
+        covered += you.get_base_mutation_level(scale);
 
     return covered;
 }
@@ -1165,7 +1196,7 @@ bool physiology_mutation_conflict(mutation_type mutat)
             {
                 if (eq_type == facet.eq
                     && mutat != facet.mut
-                    && get_base_mutation_level(facet.mut))
+                    && you.get_base_mutation_level(facet.mut))
                 {
                     return true;
                 }
@@ -1218,11 +1249,11 @@ static const char* _stat_mut_desc(mutation_type mut, bool gain)
 static bool _resist_mutation(mutation_permanence_class mutclass,
                              bool beneficial)
 {
-    if (player_mutation_level(MUT_MUTATION_RESISTANCE) == 3)
+    if (you.get_mutation_level(MUT_MUTATION_RESISTANCE) == 3)
         return true;
 
     const int mut_resist_chance = mutclass == MUTCLASS_TEMPORARY ? 2 : 3;
-    if (player_mutation_level(MUT_MUTATION_RESISTANCE)
+    if (you.get_mutation_level(MUT_MUTATION_RESISTANCE)
         && !one_chance_in(mut_resist_chance))
     {
         return true;
@@ -1315,7 +1346,7 @@ bool mutate(mutation_type which_mutation, const string &reason, bool failMsg,
     if (mutclass == MUTCLASS_NORMAL
         && (which_mutation == RANDOM_MUTATION
             || which_mutation == RANDOM_XOM_MUTATION)
-        && x_chance_in_y(how_mutated(false, true), 15))
+        && x_chance_in_y(you.how_mutated(false, true), 15))
     {
         // God gifts override mutation loss due to being heavily
         // mutated.
@@ -1359,7 +1390,7 @@ bool mutate(mutation_type which_mutation, const string &reason, bool failMsg,
 
     const mutation_def& mdef = _get_mutation_def(mutat);
 
-    if (get_base_mutation_level(mutat) >= mdef.levels)
+    if (you.get_base_mutation_level(mutat) >= mdef.levels)
     {
         bool found = false;
         if (you.species == SP_DEMONSPAWN)
@@ -1370,7 +1401,9 @@ bool mutate(mutation_type which_mutation, const string &reason, bool failMsg,
                     // This mutation is about to be re-gained, so there is
                     // no need to redraw any stats or print any messages.
                     found = true;
-                    // TODO: ??
+                    // TODO: ?? I think this is for the case where a non-innate
+                    // mutation is being made innate? If that's true, the temp
+                    // mutation bookkeeping may be wrong. Is this code ever called?
                     you.mutation[mutat]--;
                     break;
                 }
@@ -1394,7 +1427,7 @@ bool mutate(mutation_type which_mutation, const string &reason, bool failMsg,
 
     const int levels = (which_mutation == RANDOM_CORRUPT_MUTATION
                          || which_mutation == RANDOM_QAZLAL_MUTATION)
-                       ? min(2, mdef.levels - you.mutation[mutat])
+                       ? min(2, mdef.levels - you.get_base_mutation_level(mutat))
                        : 1;
     ASSERT(levels > 0); //TODO: is > too strong?
 
@@ -1411,7 +1444,7 @@ bool mutate(mutation_type which_mutation, const string &reason, bool failMsg,
             you.temp_mutation[mutat]++;
             you.attribute[ATTR_TEMP_MUTATIONS]++;
         }
-        const int cur_base_level = get_base_mutation_level(mutat);
+        const int cur_base_level = you.get_base_mutation_level(mutat);
 
         // More than three messages, need to give them by hand.
         switch (mutat)
@@ -1590,11 +1623,11 @@ static bool _delete_single_mutation_level(mutation_type mutat,
                                           bool transient)
 {
     // are there some non-innate mutations to delete?
-    if (get_base_mutation_level(mutat, false, true, true) == 0)
+    if (you.get_base_mutation_level(mutat, false, true, true) == 0)
         return false;
 
     bool was_transient = false;
-    if (has_temporary_mutation(mutat))
+    if (you.has_temporary_mutation(mutat))
     {
         if (transient)
             was_transient = true;
@@ -1707,8 +1740,8 @@ bool delete_mutation(mutation_type which_mutation, const string &reason,
     {
         if (!god_gift)
         {
-            if (player_mutation_level(MUT_MUTATION_RESISTANCE) > 1
-                && (player_mutation_level(MUT_MUTATION_RESISTANCE) == 3
+            if (you.get_mutation_level(MUT_MUTATION_RESISTANCE) > 1
+                && (you.get_mutation_level(MUT_MUTATION_RESISTANCE) == 3
                     || coinflip()))
             {
                 if (failMsg)
@@ -1753,8 +1786,8 @@ bool delete_mutation(mutation_type which_mutation, const string &reason,
                 continue;
             }
 
-            // TODO: should this be stronger? replacing a check for whether mutat is entirely innate
-            if (has_innate_mutation(mutat))
+            // Check whether there is a non-innate level of `mutat` to delete
+            if (you.get_base_mutation_level(mutat, false, true, true) == 0)
                 continue;
 
             // MUT_ANTENNAE is 0, and you.attribute[] is initialized to 0.
@@ -1775,8 +1808,8 @@ bool delete_mutation(mutation_type which_mutation, const string &reason,
             if (mismatch && (disallow_mismatch || !one_chance_in(10)))
                 continue;
 
-            if (you.temp_mutation[mutat] >= you.mutation[mutat])
-                continue; // don't attempt to cure transient mutations
+            if (you.get_base_mutation_level(mutat, true, false, true) == 0)
+                continue; // No non-transient mutations in this category to cure
 
             break;
         }
@@ -1800,10 +1833,10 @@ bool delete_all_mutations(const string &reason)
             ;
     }
     ASSERT(you.attribute[ATTR_TEMP_MUTATIONS] == 0);
-    ASSERT(how_mutated(false, true, false) == 0);
+    ASSERT(you.how_mutated(false, true, false) == 0);
     you.attribute[ATTR_TEMP_MUT_XP] = 0;
 
-    return !how_mutated();
+    return !you.how_mutated();
 }
 
 /*
@@ -1816,7 +1849,7 @@ bool delete_all_temp_mutations(const string &reason)
     bool found = false;
     for (int i = 0; i < NUM_MUTATIONS; ++i)
     {
-        while (has_temporary_mutation(static_cast<mutation_type>(i)))
+        while (you.has_temporary_mutation(static_cast<mutation_type>(i)))
             if (_delete_single_mutation_level(static_cast<mutation_type>(i), reason, true))
                 found = true;
     }
@@ -1839,7 +1872,7 @@ bool delete_temp_mutation()
 
         int count = 0;
         for (int i = 0; i < NUM_MUTATIONS; i++)
-            if (has_temporary_mutation(static_cast<mutation_type>(i)) > 0 && one_chance_in(++count))
+            if (you.has_temporary_mutation(static_cast<mutation_type>(i)) && one_chance_in(++count))
                 mutat = static_cast<mutation_type>(i);
 
 #if TAG_MAJOR_VERSION == 34
@@ -1864,80 +1897,74 @@ bool delete_temp_mutation()
     return false;
 }
 
-const char* mutation_name(mutation_type mut, bool allow_special)
+const char* mutation_name(mutation_type mut, bool allow_category)
 {
-    if (allow_special && mut >= SPECIAL_MUTATIONS && mut < MUT_NON_MUTATION)
-        return _get_special_mutation_def(mut).short_desc;
+    if (allow_category && mut >= CATEGORY_MUTATIONS && mut < MUT_NON_MUTATION)
+        return _get_category_mutation_def(mut).short_desc;
 
-    // note -- this can produce crashes if fed invalid mutations, e.g. if allow_special is false and mut is a special mutation
+    // note -- this can produce crashes if fed invalid mutations, e.g. if allow_category is false and mut is a category mutation
     if (!_is_valid_mutation(mut))
         return nullptr;
 
     return _get_mutation_def(mut).short_desc;
 }
 
-const char* special_mutation_name(mutation_type mut)
+const char* category_mutation_name(mutation_type mut)
 {
-    if (mut < SPECIAL_MUTATIONS || mut >= MUT_NON_MUTATION)
+    if (mut < CATEGORY_MUTATIONS || mut >= MUT_NON_MUTATION)
         return nullptr;
-    return _get_special_mutation_def(mut).short_desc;
+    return _get_category_mutation_def(mut).short_desc;
 }
 
 /*
  * Given some name, return a mutation type. Tries to match the short description as found in `mutation-data.h`.
- * If `partial_match` is set, will work if there is one partial match, and if it fails it will set the partial
- * matches appropriately.
+ * If `partial_matches` is set, it will fill the vector with any partial matches it finds. If there is exactly one,
+ * will return this mutation, otherwise, will fail.
  *
- * @param allow_special     whether to include special mutation types (e.g. RANDOM_GOOD)
+ * @param allow_category    whether to include category mutation types (e.g. RANDOM_GOOD)
  * @param partial_matches   an optional pointer to a vector, in case the consumer wants to do something
  *                          with the partial match results (e.g. show them to the user). If this is `nullptr`,
  *                          will accept only exact matches.
  *
  * @return the mutation type if succesful, otherwise NUM_MUTATIONS if it can't find a single match.
  */
-mutation_type mutation_from_name(string name, bool allow_special, vector<mutation_type> *partial_matches)
+mutation_type mutation_from_name(string name, bool allow_category, vector<mutation_type> *partial_matches)
 {
     mutation_type mutat = NUM_MUTATIONS;
 
     string spec = lowercase_string(name);
 
-    if (allow_special)
+    if (allow_category)
     {
-        for (int i = SPECIAL_MUTATIONS; i < MUT_NON_MUTATION; ++i)
+        for (int i = CATEGORY_MUTATIONS; i < MUT_NON_MUTATION; ++i)
         {
             mutation_type mut = static_cast<mutation_type>(i);
-            const char* wizname = special_mutation_name(mut);
-            if (!wizname)
+            const char* mut_name = category_mutation_name(mut);
+            if (!mut_name)
                 continue;
 
-            if (spec == wizname)
-            {
-                mutat = mut;
-                break;
-            }
+            if (spec == mut_name)
+                return mut; // note, won't fully populate partial_matches
 
-            if (partial_matches && strstr(wizname, spec.c_str()))
+            if (partial_matches && strstr(mut_name, spec.c_str()))
                 partial_matches->push_back(mut);
         }
-
-        if (mutat != NUM_MUTATIONS)
-            return mutat;
     }
 
     for (int i = 0; i < NUM_MUTATIONS; ++i)
     {
         mutation_type mut = static_cast<mutation_type>(i);
-        const char* wizname = mutation_name(mut);
-        if (!wizname)
+        const char* mut_name = mutation_name(mut);
+        if (!mut_name)
             continue;
 
-        if (spec == wizname)
+        if (spec == mut_name)
         {
             mutat = mut;
             break;
         }
 
-        if (partial_matches && strstr(wizname, spec.c_str()))
+        if (partial_matches && strstr(mut_name, spec.c_str()))
             partial_matches->push_back(mut);
     }
 
@@ -1982,18 +2009,18 @@ string mutation_desc(mutation_type mut, int level, bool colour,
     const bool ignore_player = (level != -1);
 
     const mutation_activity_type active = mutation_activity_level(mut);
-    const bool partially_active = (active == MUTACT_PARTIAL);
-    const bool fully_inactive = (active == MUTACT_INACTIVE);
+    const bool partially_active = (active == mutation_activity_type::PARTIAL);
+    const bool fully_inactive = (active == mutation_activity_type::INACTIVE);
 
-    const bool temporary   = has_temporary_mutation(mut);
+    const bool temporary = you.has_temporary_mutation(mut);
 
     // level == -1 means default action of current level
     if (level == -1)
     {
         if (!fully_inactive)
-            level = player_mutation_level(mut);
+            level = you.get_mutation_level(mut);
         else // give description of fully active mutation
-            level = get_base_mutation_level(mut);
+            level = you.get_base_mutation_level(mut);
     }
 
     string result;
@@ -2048,12 +2075,12 @@ string mutation_desc(mutation_type mut, int level, bool colour,
     if (colour)
     {
         const char* colourname = (MUT_BAD(mdef) ? "red" : "lightgrey");
-        const bool permanent   = has_innate_mutation(mut);
+        const bool permanent   = you.has_innate_mutation(mut);
 
         if (permanent)
         {
             const bool demonspawn = (you.species == SP_DEMONSPAWN);
-            const bool extra = get_base_mutation_level(mut, false, true, true) > 0;
+            const bool extra = you.get_base_mutation_level(mut, false, true, true) > 0;
 
             if (fully_inactive || (mut == MUT_COLD_BLOODED && player_res_cold(false) > 0))
                 colourname = "darkgrey";
@@ -2075,7 +2102,7 @@ string mutation_desc(mutation_type mut, int level, bool colour,
         else if (is_slime_mutation(mut))
             colourname = "green";
         else if (temporary)
-            colourname = (you.mutation[mut] > you.temp_mutation[mut]) ?
+            colourname = (you.get_base_mutation_level(mut, true, false, true) > 0) ?
                          "lightmagenta" : "magenta";
 
         // Build the result
@@ -2370,18 +2397,19 @@ bool perma_mutate(mutation_type which_mut, int how_much, const string &reason)
     while (how_much-- > 0)
     {
         dprf("Perma Mutate: %d, %d, %d", cap,
-             you.mutation[which_mut], you.innate_mutation[which_mut]);
-        if (you.mutation[which_mut] == cap && how_much == 0)
+            you.get_base_mutation_level(which_mut), you.get_innate_mutation_level(which_mut));
+        if (you.get_base_mutation_level(which_mut) == cap && how_much == 0)
         {
             // [rpb] primarily for demonspawn, if the mutation level is already
             // at the cap for this facet, we are permafying a temporary
             // mutation. This would otherwise fail to produce any output in
             // some situations.
+            // TODO: double check temp mutation bookkeeping, this looks like it doesn't do it
             mprf(MSGCH_MUTATION, "Your mutations feel more permanent.");
             take_note(Note(NOTE_PERM_MUTATION, which_mut,
-                           you.mutation[which_mut], reason.c_str()));
+                    you.get_base_mutation_level(which_mut), reason.c_str()));
         }
-        else if (you.mutation[which_mut] < cap
+        else if (you.get_base_mutation_level(which_mut) < cap
             && !mutate(which_mut, reason, false, true, false, false, MUTCLASS_INNATE))
         {
             return levels; // a partial success was still possible
@@ -2414,10 +2442,8 @@ bool temp_mutation_wanes()
         max(starting_tmuts * 5 / 12 - random2(3),
         1 + random2(3)));
 
-    if (num_remove >= starting_tmuts)
-        mprf(MSGCH_DURATION, "You feel the corruption within you wane completely.");
-    else
-        mprf(MSGCH_DURATION, "You feel the corruption within you wane somewhat.");
+    mprf(MSGCH_DURATION, "You feel the corruption within you wane %s.",
+        (num_remove >= starting_tmuts ? "completely" : "somewhat"));
 
     for (int i = 0; i < num_remove; ++i)
         delete_temp_mutation(); // chooses randomly
@@ -2437,9 +2463,9 @@ bool temp_mutation_wanes()
  * @return Either the number of matching mutations, or the sum of their
  *         levels, depending on \c levels
  */
-int how_mutated(bool innate, bool levels, bool temp)
+int player::how_mutated(bool innate, bool levels, bool temp) const
 {
-    int j = 0;
+    int result = 0;
 
     for (int i = 0; i < NUM_MUTATIONS; ++i)
     {
@@ -2448,25 +2474,25 @@ int how_mutated(bool innate, bool levels, bool temp)
             const int mut_level = get_base_mutation_level(static_cast<mutation_type>(i), innate, temp);
 
             if (levels)
-                j += mut_level;
+                result += mut_level;
             else if (mut_level > 0)
-                j++;
+                result++;
         }
         if (you.species == SP_DEMONSPAWN
             && you.props.exists("num_sacrifice_muts"))
         {
-            j -= you.props["num_sacrifice_muts"].get_int();
+            result -= you.props["num_sacrifice_muts"].get_int();
         }
     }
 
-    return j;
+    return result;
 }
 
 // Return whether current tension is balanced
 static bool _balance_demonic_guardian()
 {
     // if tension is unfavorably high, perhaps another guardian should spawn
-    const int mutlevel = player_mutation_level(MUT_DEMONIC_GUARDIAN);
+    const int mutlevel = you.get_mutation_level(MUT_DEMONIC_GUARDIAN);
     const int tension = get_tension(GOD_NO_GOD);
     return tension*3/4 <= mutlevel*6 + random2(mutlevel*mutlevel*2);
 }
@@ -2480,10 +2506,10 @@ void check_demonic_guardian()
 {
     // Players hated by all monsters don't get guardians, so that they aren't
     // swarmed by hostile executioners whenever things get rough.
-    if (player_mutation_level(MUT_NO_LOVE))
+    if (you.get_mutation_level(MUT_NO_LOVE))
         return;
 
-    const int mutlevel = player_mutation_level(MUT_DEMONIC_GUARDIAN);
+    const int mutlevel = you.get_mutation_level(MUT_DEMONIC_GUARDIAN);
 
     if (!_balance_demonic_guardian() &&
         you.duration[DUR_DEMONIC_GUARDIAN] == 0)
@@ -2594,7 +2620,7 @@ void check_monster_detect()
 int augmentation_amount()
 {
     int amount = 0;
-    const int level = player_mutation_level(MUT_AUGMENTATION);
+    const int level = you.get_mutation_level(MUT_AUGMENTATION);
 
     for (int i = 0; i < level; ++i)
     {

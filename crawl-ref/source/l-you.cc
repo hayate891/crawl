@@ -375,7 +375,7 @@ static int you_gold(lua_State *ls)
 static int you_can_consume_corpses(lua_State *ls)
 {
     lua_pushboolean(ls,
-                     player_mutation_level(MUT_HERBIVOROUS) < 3
+                     you.get_mutation_level(MUT_HERBIVOROUS) < 3
                      && !you_foodless()
                   );
     return 1;
@@ -422,7 +422,7 @@ LUAFN(you_get_base_mutation_level)
     bool normal = lua_toboolean(ls, 4);
     mutation_type mut = mutation_from_name(mutname, false);
     if (mut != NUM_MUTATIONS)
-        PLUARET(integer, get_base_mutation_level(mut, innate, temp, normal)); // includes innate mutations
+        PLUARET(integer, you.get_base_mutation_level(mut, innate, temp, normal)); // includes innate mutations
 
     string err = make_stringf("No such mutation: '%s'.", mutname.c_str());
     return luaL_argerror(ls, 1, err.c_str());
@@ -433,7 +433,7 @@ LUAFN(you_how_mutated)
     bool innate = lua_toboolean(ls, 1); // whether to include innate mutations
     bool levels = lua_toboolean(ls, 2); // whether to count levels
     bool temp = lua_toboolean(ls, 3); // whether to include temporary mutations
-    int result = how_mutated(innate, levels, temp);
+    int result = you.how_mutated(innate, levels, temp);
     PLUARET(number, result);
 }
 
@@ -443,7 +443,7 @@ LUAFN(you_mutation)
     string mutname = luaL_checkstring(ls, 1);
     mutation_type mut = mutation_from_name(mutname, false);
     if (mut != NUM_MUTATIONS)
-        PLUARET(integer, get_base_mutation_level(mut, true, true, true)); // includes innate, temp mutations. I'm not sure if this is what was intended but this was the old behavior.
+        PLUARET(integer, you.get_base_mutation_level(mut, true, true, true)); // includes innate, temp mutations. I'm not sure if this is what was intended but this was the old behavior.
 
     string err = make_stringf("No such mutation: '%s'.", mutname.c_str());
     return luaL_argerror(ls, 1, err.c_str());
@@ -454,7 +454,7 @@ LUAFN(you_temp_mutation)
     string mutname = luaL_checkstring(ls, 1);
     mutation_type mut = mutation_from_name(mutname, false);
     if (mut != NUM_MUTATIONS)
-        PLUARET(integer, get_base_mutation_level(mut, false, true, false));
+        PLUARET(integer, you.get_base_mutation_level(mut, false, true, false));
 
     string err = make_stringf("No such mutation: '%s'.", mutname.c_str());
     return luaL_argerror(ls, 1, err.c_str());

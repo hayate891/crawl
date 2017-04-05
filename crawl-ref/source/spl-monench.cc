@@ -10,7 +10,6 @@
 
 #include "env.h"
 #include "message.h"
-#include "mutation.h"
 #include "spl-util.h"
 #include "terrain.h"
 
@@ -49,7 +48,7 @@ int englaciate(coord_def where, int pow, actor *agent)
         return 0;
     }
 
-    if ((!mons && player_mutation_level(MUT_COLD_BLOODED))
+    if ((!mons && you.get_mutation_level(MUT_COLD_BLOODED))
         || (mons && mons_class_flag(mons->type, M_COLD_BLOOD)))
     {
         duration *= 2;

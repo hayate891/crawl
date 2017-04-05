@@ -1947,7 +1947,7 @@ static void _print_overview_screen_equip(column_composer& cols,
         else if (eqslot == EQ_WEAPON
                  && you.form == transformation::blade_hands)
         {
-            const bool plural = !player_mutation_level(MUT_MISSING_HAND);
+            const bool plural = !you.get_mutation_level(MUT_MISSING_HAND);
             str = string("  - Blade Hand") + (plural ? "s" : "");
         }
         else if (eqslot == EQ_BOOTS
@@ -2353,7 +2353,7 @@ static vector<formatted_string> _get_overview_resistances(
     out += _resist_composer("rCorr", cwidth, rcorr) + "\n";
 
     const int rmuta = (you.rmut_from_item(calc_unid)
-                       || player_mutation_level(MUT_MUTATION_RESISTANCE) == 3);
+                       || you.get_mutation_level(MUT_MUTATION_RESISTANCE) == 3);
     if (rmuta)
         out += _resist_composer("rMut", cwidth, rmuta) + "\n";
 
@@ -2397,7 +2397,7 @@ static vector<formatted_string> _get_overview_resistances(
     const int stasis = you.stasis();
     // TODO: what about different levels of anger/berserkitis?
     const bool show_angry = (you.angry(calc_unid)
-                             || player_mutation_level(MUT_BERSERK))
+                             || you.get_mutation_level(MUT_BERSERK))
                             && !rclar && !stasis
                             && !you.is_lifeless_undead();
     if (show_angry || rclar)
@@ -2578,15 +2578,15 @@ string mutation_overview()
     string current;
     for (unsigned i = 0; i < NUM_MUTATIONS; ++i)
     {
-        if (!you.mutation[i])
+        const mutation_type mut = static_cast<mutation_type>(i);
+        if (!you.has_mutation(mut))
             continue;
 
-        const mutation_type mut = (mutation_type) i;
-        const int current_level = player_mutation_level(mut);
-        const int base_level = get_base_mutation_level(mut);
+        const int current_level = you.get_mutation_level(mut);
+        const int base_level = you.get_base_mutation_level(mut);
         const bool lowered = current_level < base_level;
-        const int temp_levels = get_base_mutation_level(mut, false, true, false); // only temp levels
-        const int ordinary_levels = get_base_mutation_level(mut, true, false, true); // excluding temp levels
+        const int temp_levels = you.get_base_mutation_level(mut, false, true, false); // only temp levels
+        const int ordinary_levels = you.get_base_mutation_level(mut, true, false, true); // excluding temp levels
 
         const int max_levels = mutation_max_levels(mut);
 
@@ -2604,7 +2604,7 @@ string mutation_overview()
                 // at least some non-temporary levels
                 ostr << ordinary_levels;
                 if (temp_levels)
-                    ostr << "+[" << temp_levels << "]";
+                    ostr << "[+" << temp_levels << "]";
             }
             current += ostr.str();
         }

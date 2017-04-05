@@ -500,7 +500,7 @@ int detect_items(int pow)
             if (map_radius <= 0)
                 return 0;
         }
-        else if (you.mutation[MUT_JELLY_GROWTH]) //Jiyva
+        else if (you.has_mutation(MUT_JELLY_GROWTH)) //Jiyva
             map_radius = 5;
     }
 

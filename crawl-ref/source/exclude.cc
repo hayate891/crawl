@@ -20,7 +20,6 @@
 #include "libutil.h"
 #include "map-knowledge.h"
 #include "mon-util.h"
-#include "mutation.h"
 #include "options.h"
 #include "stringutil.h"
 #include "tags.h"
@@ -74,7 +73,7 @@ static bool _need_auto_exclude(const monster* mon, bool sleepy = false)
 static int _get_full_exclusion_radius()
 {
     // XXX: dedup with update_vision_range()!
-    return LOS_DEFAULT_RANGE - player_mutation_level(MUT_NIGHTSTALKER)
+    return LOS_DEFAULT_RANGE - you.get_mutation_level(MUT_NIGHTSTALKER)
                              + (you.species == SP_BARACHI ? 1 : 0);
 }
 

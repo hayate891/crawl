@@ -49,7 +49,6 @@
 #include "mon-project.h"
 #include "mon-speak.h"
 #include "mon-tentacle.h"
-#include "mutation.h"
 #include "nearby-danger.h"
 #include "religion.h"
 #include "rot.h"
@@ -2335,7 +2334,7 @@ static void _clear_monster_flags()
 **/
 static void _update_monster_attitude(monster *mon)
 {
-    if (player_mutation_level(MUT_NO_LOVE)
+    if (you.get_mutation_level(MUT_NO_LOVE)
         && !mons_is_conjured(mon->type))
     {
         mon->attitude = ATT_HOSTILE;

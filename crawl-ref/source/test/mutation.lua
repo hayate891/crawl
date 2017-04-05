@@ -102,5 +102,5 @@ end
 
 test_basic_mutation_stuff()
 try_all_mutation_categories()
-test_potion(tries, mut_iterations)
+test_potion(5, mut_iterations)
 test_random_mutations(tries, mut_iterations, chance_temporary, chance_clear)

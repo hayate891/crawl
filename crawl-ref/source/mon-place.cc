@@ -38,7 +38,6 @@
 #include "mon-pick.h"
 #include "mon-poly.h"
 #include "mon-tentacle.h"
-#include "mutation.h"
 #include "options.h"
 #include "random.h"
 #include "religion.h"
@@ -3111,7 +3110,7 @@ conduct_type player_will_anger_monster(monster_type type)
  */
 conduct_type player_will_anger_monster(const monster &mon)
 {
-    if (player_mutation_level(MUT_NO_LOVE) && !mons_is_conjured(mon.type))
+    if (you.get_mutation_level(MUT_NO_LOVE) && !mons_is_conjured(mon.type))
     {
         // Player angers all real monsters
         return DID_SACRIFICE_LOVE;

@@ -510,7 +510,7 @@ bool wizard_add_mutation()
     bool success = false;
     char specs[80];
 
-    if (player_mutation_level(MUT_MUTATION_RESISTANCE) > 0)
+    if (you.has_mutation(MUT_MUTATION_RESISTANCE))
         mpr("Ignoring mut resistance to apply mutation.");
     unwind_var<uint8_t> mut_res(you.mutation[MUT_MUTATION_RESISTANCE], 0);
 
@@ -527,7 +527,7 @@ bool wizard_add_mutation()
     vector<mutation_type> partial_matches;
     mutation_type mutat = mutation_from_name(specs, true, &partial_matches);
 
-    if (mutat >= SPECIAL_MUTATIONS)
+    if (mutat >= CATEGORY_MUTATIONS)
          return mutate(mutat, "wizard power", true, true);
 
     if (mutat == NUM_MUTATIONS)
@@ -543,10 +543,8 @@ bool wizard_add_mutation()
             for (mutation_type mut : partial_matches)
             {
                 const char *mutname = mutation_name(mut, true);
-                if (mutname)
-                    matches.emplace_back(mutname);
-                else
-                    matches.emplace_back("INVALID MUTATION");
+                ASSERT(mutname); // `mutation_name` returns nullptr if something went wrong getting the desc for `mut`.
+                matches.emplace_back(mutname);
             }
 
             string prefix = make_stringf("No exact match for mutation '%s', possible matches are: ", specs);

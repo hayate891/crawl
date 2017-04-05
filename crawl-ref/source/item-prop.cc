@@ -25,7 +25,6 @@
 #include "libutil.h" // map_find
 #include "message.h"
 #include "misc.h"
-#include "mutation.h"
 #include "notes.h"
 #include "options.h"
 #include "orb-type.h"
@@ -2342,8 +2341,8 @@ int food_value(const item_def &item)
 {
     ASSERT(item.defined() && item.base_type == OBJ_FOOD);
 
-    const int herb = player_mutation_level(MUT_HERBIVOROUS);
-    const int carn = player_mutation_level(MUT_CARNIVOROUS);
+    const int herb = you.get_mutation_level(MUT_HERBIVOROUS);
+    const int carn = you.get_mutation_level(MUT_CARNIVOROUS);
 
     const food_def &food = Food_prop[Food_index[item.sub_type]];
 
